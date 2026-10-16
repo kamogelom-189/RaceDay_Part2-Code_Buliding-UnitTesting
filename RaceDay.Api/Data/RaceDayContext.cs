@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Models;
 
 namespace RaceDay.Api.Data
@@ -23,8 +24,7 @@ namespace RaceDay.Api.Data
 
         public DbSet<Result> Results => Set<Result>();
 
-        protected override void OnModelCreating(
-            ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
@@ -117,6 +117,11 @@ namespace RaceDay.Api.Data
                 entity.Property(e => e.Location)
                     .HasMaxLength(150)
                     .IsUnicode(false)
+                    .IsRequired();
+
+                // Event distance 
+                entity.Property(e => e.DistanceKM)
+                    .HasColumnType("decimal(6,2)")
                     .IsRequired();
 
                 entity.Property(e => e.EventType)
