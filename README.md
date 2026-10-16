@@ -2,6 +2,10 @@
 
 RaceDay is a C# project focused on practicing build automation and unit testing techniques. This repository contains the code, unit tests, and instructions to build, run, and test the RaceDay project using the .NET CLI.
 
+## Youtube
+https://youtu.be/SWEUkmfFz-g
+
+
 ## What this repo contains
 
 - Source code for the RaceDay application (C#).
