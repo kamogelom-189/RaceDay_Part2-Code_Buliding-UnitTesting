@@ -1,11 +1,22 @@
+
 name: RaceDay Build and Test
+
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
-      - main
+      - master
+  workflow_dispatch:
+
 permissions:
   contents: read
+
+concurrency:
+  group: raceday-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: windows-latest
@@ -26,4 +37,4 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Run unit tests
-        run: dotnet test --configuration Release --no-build
+        run: dotnet test --configuration Release --no-build --logger "console;verbosity=normal"
