@@ -77,9 +77,3 @@ Contributions, bug reports, and improvements are welcome. Typical workflow:
 - Keep unit tests isolated and deterministic.
 
 ## License
-
-Specify the license you want to use for this repository (for example MIT). If you don't have a license yet, consider adding one so others know how they may use your code.
-
----
-
-If you'd like, I can customize this README with the exact project names, example commands adapted to your repo layout, badges (build/tests), or add a quick start section — tell me what you'd like included.
