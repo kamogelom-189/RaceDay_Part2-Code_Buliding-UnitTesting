@@ -13,6 +13,7 @@
         public DateTime EventDate { get; set; }
 
         public string Location { get; set; } = string.Empty;
+        public decimal DistanceKM { get; set; }
 
         public string EventType { get; set; } = "run";
 

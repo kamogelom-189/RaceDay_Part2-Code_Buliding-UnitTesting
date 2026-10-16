@@ -146,6 +146,9 @@ namespace RaceDay.Api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("varchar(max)");
 
+                    b.Property<decimal>("DistanceKM")
+                        .HasColumnType("decimal(6,2)");
+
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime");
 
