@@ -76,4 +76,4 @@ Contributions, bug reports, and improvements are welcome. Typical workflow:
 - Use meaningful names and small, focused methods.
 - Keep unit tests isolated and deterministic.
 
-## License
+
