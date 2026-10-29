@@ -12,6 +12,8 @@
 
         public string PasswordHash { get; set; } = string.Empty;
 
+        public string? ProfilePictureUrl { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public Role? Role { get; set; }
@@ -21,6 +23,5 @@
 
         public ICollection<Enrolment> Enrolments { get; set; }
             = new List<Enrolment>();
-        public string? ProfilePictureUrl { get; set; }
     }
 }

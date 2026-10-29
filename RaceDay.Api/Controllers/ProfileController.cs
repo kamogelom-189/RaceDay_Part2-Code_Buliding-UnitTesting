@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Data;
 using RaceDay.Api.DTOs;
 using RaceDay.Api.Services;
-using System.Security.Claims;
 
 namespace RaceDay.Api.Controllers
 {
@@ -54,40 +54,8 @@ namespace RaceDay.Api.Controllers
                 user.FullName,
                 user.Email,
                 Role = user.Role?.RoleName,
+                user.ProfilePictureUrl,
                 user.CreatedAt
-            });
-        }
-
-        // POST: api/profile/me/picture
-        [HttpPost("me/picture")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadPicture(IFormFile file)
-        {
-            if (!int.TryParse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier),
-                out int userId))
-                return Unauthorized();
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserId == userId);
-
-            if (user == null)
-                return NotFound(new { message = "User profile not found." });
-
-            string? error = ImageValidator.Validate(file);
-            if (error != null)
-                return BadRequest(new { message = error });
-
-            await using var stream = file.OpenReadStream();
-            user.ProfilePictureUrl = await _blobStorage.UploadAsync(
-                stream, file.FileName, file.ContentType);
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = "Profile picture uploaded successfully.",
-                user.ProfilePictureUrl
             });
         }
 
@@ -138,6 +106,51 @@ namespace RaceDay.Api.Controllers
             return Ok(new
             {
                 message = "Profile updated successfully."
+            });
+        }
+
+        // POST: api/profile/me/picture
+        [HttpPost("me/picture")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadPicture(IFormFile file)
+        {
+            var userIdValue = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdValue, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    message = "User profile not found."
+                });
+            }
+
+            string? error = ImageValidator.Validate(file);
+
+            if (error != null)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            await using var stream = file.OpenReadStream();
+
+            user.ProfilePictureUrl = await _blobStorage.UploadAsync(
+                stream, file.FileName, file.ContentType);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Profile picture uploaded successfully.",
+                user.ProfilePictureUrl
             });
         }
     }

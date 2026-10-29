@@ -84,12 +84,11 @@ builder.Services.AddAuthentication(
 // Add authorization
 builder.Services.AddAuthorization();
 
-// Register password hashing
+// Register password hashing and blob storage services
 builder.Services.AddScoped<
     IPasswordHasher<AppUser>,
     PasswordHasher<AppUser>>();
 
-// Register Blob Storage Service
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Build the application AFTER registering all services

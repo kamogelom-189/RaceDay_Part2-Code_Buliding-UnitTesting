@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Data;
 using RaceDay.Api.DTOs;
 using RaceDay.Api.Models;
 using RaceDay.Api.Services;
-using System.Security.Claims;
 
 namespace RaceDay.Api.Controllers
 {
@@ -42,7 +42,8 @@ namespace RaceDay.Api.Controllers
                     e.Location,
                     e.DistanceKM,
                     e.EventType,
-                    e.OrganiserId
+                    e.OrganiserId,
+                    e.BannerUrl
                 })
                 .ToListAsync();
 
@@ -65,7 +66,8 @@ namespace RaceDay.Api.Controllers
                     e.Location,
                     e.DistanceKM,
                     e.EventType,
-                    e.OrganiserId
+                    e.OrganiserId,
+                    e.BannerUrl
                 })
                 .FirstOrDefaultAsync();
 
@@ -133,7 +135,8 @@ namespace RaceDay.Api.Controllers
                     raceEvent.Location,
                     raceEvent.DistanceKM,
                     raceEvent.EventType,
-                    raceEvent.OrganiserId
+                    raceEvent.OrganiserId,
+                    raceEvent.BannerUrl
                 });
         }
 
@@ -196,6 +199,59 @@ namespace RaceDay.Api.Controllers
             });
         }
 
+        // POST: api/events/1/banner
+        // Organisers upload a banner image for their own event.
+        [HttpPost("{id:int}/banner")]
+        [Authorize(Roles = "Organiser")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadBanner(
+            int id, IFormFile file)
+        {
+            var userIdValue = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdValue, out int organiserId))
+            {
+                return Unauthorized();
+            }
+
+            var raceEvent = await _context.Events
+                .FirstOrDefaultAsync(e => e.EventId == id);
+
+            if (raceEvent == null)
+            {
+                return NotFound(new
+                {
+                    message = "Event not found."
+                });
+            }
+
+            if (raceEvent.OrganiserId != organiserId)
+            {
+                return Forbid();
+            }
+
+            string? error = ImageValidator.Validate(file);
+
+            if (error != null)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            await using var stream = file.OpenReadStream();
+
+            raceEvent.BannerUrl = await _blobStorage.UploadAsync(
+                stream, file.FileName, file.ContentType);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Banner uploaded successfully.",
+                raceEvent.BannerUrl
+            });
+        }
+
         // DELETE: api/events/1
         // Organisers can delete their own events.
         [HttpDelete("{id:int}")]
@@ -244,43 +300,6 @@ namespace RaceDay.Api.Controllers
             return Ok(new
             {
                 message = "Event deleted successfully."
-            });
-        }
-
-        // POST: api/events/1/banner
-        [HttpPost("{id:int}/banner")]
-        [Authorize(Roles = "Organiser")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadBanner(int id, IFormFile file)
-        {
-            if (!int.TryParse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier),
-                out int organiserId))
-                return Unauthorized();
-
-            var raceEvent = await _context.Events
-                .FirstOrDefaultAsync(e => e.EventId == id);
-
-            if (raceEvent == null)
-                return NotFound(new { message = "Event not found." });
-
-            if (raceEvent.OrganiserId != organiserId)
-                return Forbid();
-
-            string? error = ImageValidator.Validate(file);
-            if (error != null)
-                return BadRequest(new { message = error });
-
-            await using var stream = file.OpenReadStream();
-            raceEvent.BannerUrl = await _blobStorage.UploadAsync(
-                stream, file.FileName, file.ContentType);
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = "Banner uploaded successfully.",
-                raceEvent.BannerUrl
             });
         }
     }
