@@ -1,4 +1,3 @@
-
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -6,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RaceDay.Api.Data;
 using RaceDay.Api.Models;
+using RaceDay.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +44,7 @@ builder.Services.AddSwaggerGen(options =>
             }
         });
 });
+
 // Connect to SQL Server
 builder.Services.AddDbContext<RaceDayContext>(options =>
     options.UseSqlServer(
@@ -83,10 +84,12 @@ builder.Services.AddAuthentication(
 // Add authorization
 builder.Services.AddAuthorization();
 
-// Register password hashing
+// Register password hashing and blob storage services
 builder.Services.AddScoped<
     IPasswordHasher<AppUser>,
     PasswordHasher<AppUser>>();
+
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Build the application AFTER registering all services
 var app = builder.Build();
