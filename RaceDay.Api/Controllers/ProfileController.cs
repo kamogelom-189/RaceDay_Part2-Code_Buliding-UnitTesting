@@ -1,10 +1,10 @@
-﻿
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Data;
 using RaceDay.Api.DTOs;
+using RaceDay.Api.Services;
+using System.Security.Claims;
 
 namespace RaceDay.Api.Controllers
 {
@@ -14,10 +14,14 @@ namespace RaceDay.Api.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly RaceDayContext _context;
+        private readonly IBlobStorageService _blobStorage;
 
-        public ProfileController(RaceDayContext context)
+        public ProfileController(
+            RaceDayContext context,
+            IBlobStorageService blobStorage)
         {
             _context = context;
+            _blobStorage = blobStorage;
         }
 
         // GET: api/profile/me
@@ -51,6 +55,39 @@ namespace RaceDay.Api.Controllers
                 user.Email,
                 Role = user.Role?.RoleName,
                 user.CreatedAt
+            });
+        }
+
+        // POST: api/profile/me/picture
+        [HttpPost("me/picture")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadPicture(IFormFile file)
+        {
+            if (!int.TryParse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier),
+                out int userId))
+                return Unauthorized();
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return NotFound(new { message = "User profile not found." });
+
+            string? error = ImageValidator.Validate(file);
+            if (error != null)
+                return BadRequest(new { message = error });
+
+            await using var stream = file.OpenReadStream();
+            user.ProfilePictureUrl = await _blobStorage.UploadAsync(
+                stream, file.FileName, file.ContentType);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Profile picture uploaded successfully.",
+                user.ProfilePictureUrl
             });
         }
 

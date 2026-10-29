@@ -49,5 +49,6 @@ namespace RaceDay.Api.Services
 
     public interface IBlobStorageService
     {
+        Task<string?> UploadAsync(Stream stream, string fileName, string contentType);
     }
 }
