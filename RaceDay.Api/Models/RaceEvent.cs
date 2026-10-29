@@ -21,5 +21,6 @@
 
         public ICollection<Category> Categories { get; set; }
             = new List<Category>();
+        public string? BannerUrl { get; set; }
     }
 }

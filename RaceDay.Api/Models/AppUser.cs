@@ -21,5 +21,6 @@
 
         public ICollection<Enrolment> Enrolments { get; set; }
             = new List<Enrolment>();
+        public string? ProfilePictureUrl { get; set; }
     }
 }

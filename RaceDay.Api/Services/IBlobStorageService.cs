@@ -46,4 +46,8 @@ namespace RaceDay.Api.Services
             return blob.Uri.ToString();
         }
     }
+
+    public interface IBlobStorageService
+    {
+    }
 }
