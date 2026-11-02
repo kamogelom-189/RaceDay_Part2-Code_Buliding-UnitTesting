@@ -53,7 +53,7 @@ namespace RaceDay.Api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("ProfilePictureUrl")
+                    b.Property<string>("ProfilePictureBlobName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RoleId")
@@ -146,7 +146,7 @@ namespace RaceDay.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
 
-                    b.Property<string>("BannerUrl")
+                    b.Property<string>("BannerBlobName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")

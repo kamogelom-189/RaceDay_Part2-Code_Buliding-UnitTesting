@@ -43,7 +43,7 @@ namespace RaceDay.Api.Controllers
                     e.DistanceKM,
                     e.EventType,
                     e.OrganiserId,
-                    e.BannerUrl
+                    e.BannerBlobName
                 })
                 .ToListAsync();
 
@@ -67,7 +67,7 @@ namespace RaceDay.Api.Controllers
                     e.DistanceKM,
                     e.EventType,
                     e.OrganiserId,
-                    e.BannerUrl
+                    e.BannerBlobName
                 })
                 .FirstOrDefaultAsync();
 
@@ -136,7 +136,7 @@ namespace RaceDay.Api.Controllers
                     raceEvent.DistanceKM,
                     raceEvent.EventType,
                     raceEvent.OrganiserId,
-                    raceEvent.BannerUrl
+                    raceEvent.BannerBlobName
                 });
         }
 
@@ -240,7 +240,7 @@ namespace RaceDay.Api.Controllers
 
             await using var stream = file.OpenReadStream();
 
-            raceEvent.BannerUrl = await _blobStorage.UploadAsync(
+            raceEvent.BannerBlobName = await _blobStorage.UploadAsync(
                 stream, file.FileName, file.ContentType);
 
             await _context.SaveChangesAsync();
@@ -248,7 +248,7 @@ namespace RaceDay.Api.Controllers
             return Ok(new
             {
                 message = "Banner uploaded successfully.",
-                raceEvent.BannerUrl
+                raceEvent.BannerBlobName
             });
         }
 

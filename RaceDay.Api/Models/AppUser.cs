@@ -12,7 +12,7 @@
 
         public string PasswordHash { get; set; } = string.Empty;
 
-        public string? ProfilePictureUrl { get; set; }
+        public string? ProfilePictureBlobName { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

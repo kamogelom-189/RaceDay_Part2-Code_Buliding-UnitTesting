@@ -18,7 +18,7 @@
 
         public string EventType { get; set; } = "run";
 
-        public string? BannerUrl { get; set; }
+        public string? BannerBlobName { get; set; }
 
         public AppUser? Organiser { get; set; }
 

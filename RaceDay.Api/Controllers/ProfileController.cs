@@ -54,7 +54,7 @@ namespace RaceDay.Api.Controllers
                 user.FullName,
                 user.Email,
                 Role = user.Role?.RoleName,
-                user.ProfilePictureUrl,
+                user.ProfilePictureBlobName,
                 user.CreatedAt
             });
         }
@@ -142,7 +142,7 @@ namespace RaceDay.Api.Controllers
 
             await using var stream = file.OpenReadStream();
 
-            user.ProfilePictureUrl = await _blobStorage.UploadAsync(
+            user.ProfilePictureBlobName = await _blobStorage.UploadAsync(
                 stream, file.FileName, file.ContentType);
 
             await _context.SaveChangesAsync();
@@ -150,7 +150,7 @@ namespace RaceDay.Api.Controllers
             return Ok(new
             {
                 message = "Profile picture uploaded successfully.",
-                user.ProfilePictureUrl
+                user.ProfilePictureBlobName
             });
         }
     }

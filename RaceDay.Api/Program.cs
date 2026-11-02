@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using RaceDay.Api.Data;
 using RaceDay.Api.Models;
 using RaceDay.Api.Services;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,12 @@ builder.Services.AddScoped<
     PasswordHasher<AppUser>>();
 
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnectionString:blobServiceUri"]!).WithName("StorageConnectionString");
+    clientBuilder.AddQueueServiceClient(builder.Configuration["StorageConnectionString:queueServiceUri"]!).WithName("StorageConnectionString");
+    clientBuilder.AddTableServiceClient(builder.Configuration["StorageConnectionString:tableServiceUri"]!).WithName("StorageConnectionString");
+});
 
 // Build the application AFTER registering all services
 var app = builder.Build();

@@ -1,6 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1. Turn on MVC (controllers and views)
 builder.Services.AddControllersWithViews();
 
 // 2. Session: remembers the logged-in user between pages
