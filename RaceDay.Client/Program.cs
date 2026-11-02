@@ -1,25 +1,22 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Turn on MVC (controllers and views)
 builder.Services.AddControllersWithViews();
 
-// 2. Session: remembers the logged-in user between pages
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-// 3. HttpClient: lets MVC call the API
 builder.Services.AddHttpClient("Api", client =>
 {
-    var url = builder.Configuration["ApiSettings:BaseUrl"]
-        ?? throw new InvalidOperationException(
-            "ApiSettings:BaseUrl is missing.");
+    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"]
+        ?? throw new InvalidOperationException("ApiSettings:BaseUrl is missing.");
 
-    client.BaseAddress = new Uri(url);
+    client.BaseAddress = new Uri(baseUrl);
 });
 
 var app = builder.Build();
@@ -33,8 +30,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-app.UseSession();        // must come after UseRouting
+app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(
