@@ -1,0 +1,13 @@
+# Starts the RaceDay MVC web application in Docker.
+# The API runs on your computer (see README) and the container reaches
+# it through host.docker.internal.
+services:
+  raceday-web:
+    build: ./RaceDay.Client
+    image: raceday-mvc
+    ports:
+      - "8080:8080"
+    environment:
+      - ApiSettings__BaseUrl=http://host.docker.internal:5208/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
