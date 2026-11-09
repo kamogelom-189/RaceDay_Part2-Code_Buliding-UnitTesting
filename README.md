@@ -8,7 +8,7 @@ and cycling events). It is built in three parts:
 | 1-2  | REST API, database (SQL Server) and unit/API tests | `RaceDay.Api`, `RaceDay.Tests` |
 | 3    | ASP.NET Core MVC web application, Azure Blob Storage, Docker | `RaceDay.Client` |
 
-**YouTube demo video (unlisted):** `<paste your link here>`
+**YouTube demo video (unlisted):** `https://youtu.be/ZklUuQttbkY `
 
 ---
 
